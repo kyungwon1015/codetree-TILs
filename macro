@@ -10,6 +10,8 @@ Sub InsertDepartureNoToSQL()
     Dim supplier As String
     Dim sqlQuery As String
     Dim filePath As String
+    Dim checkQuery As String
+    Dim rs As Object
 
     ' Downloads 폴더에 있는 arrival.xlsx 파일 경로 설정
     filePath = Environ("USERPROFILE") & "\Downloads\arrival.xlsx"
@@ -36,13 +38,17 @@ Sub InsertDepartureNoToSQL()
         material = ws.Cells(row, "Material").Value
         supplier = ws.Cells(row, "Supplier").Value
 
-        ' Material과 Supplier가 동일한 조건을 만족하는 경우
-        If material = supplier Then
-            ' SQL 삽입 쿼리 작성
+        ' DB에서 Material과 Supplier가 일치하는지 확인
+        checkQuery = "SELECT COUNT(*) FROM YourTableName " & _
+                     "WHERE material = '" & material & "' AND supplier = '" & supplier & "'"
+        
+        ' SQL 쿼리 실행하여 해당 조건의 데이터가 있는지 확인
+        Set rs = conn.Execute(checkQuery)
+        
+        If rs.Fields(0).Value > 0 Then
+            ' 조건에 맞는 데이터가 존재하면 departureNo를 DB에 삽입
             sqlQuery = "INSERT INTO YourTableName (departureNo) " & _
                        "VALUES ('" & departureNo & "')"
-            
-            ' DB에 쿼리 실행
             conn.Execute sqlQuery
         End If
     Next row
