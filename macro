@@ -1,0 +1,60 @@
+Sub InsertDepartureNoToSQL()
+
+    Dim conn As Object
+    Dim connStr As String
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim row As Long
+    Dim departureNo As String
+    Dim material As String
+    Dim supplier As String
+    Dim sqlQuery As String
+    Dim filePath As String
+
+    ' Downloads 폴더에 있는 arrival.xlsx 파일 경로 설정
+    filePath = Environ("USERPROFILE") & "\Downloads\arrival.xlsx"
+
+    ' DB 연결 문자열
+    connStr = "Driver={SQL Server};" & _
+              "Server=10.182.162.181;" & _
+              "Database=tosca_com_repo;" & _
+              "Uid=toscadbuser;" & _
+              "Pwd=Pa55w0rd!!;" & _
+              "TrustServerCertificate=yes;"
+
+    ' SQL 연결 객체 생성
+    Set conn = CreateObject("ADODB.Connection")
+    conn.Open connStr
+
+    ' arrival.xlsx 파일 열기
+    Set wb = Workbooks.Open(filePath)
+    Set ws = wb.Sheets(1)  ' 첫 번째 시트를 사용 (시트 이름에 따라 수정 가능)
+
+    ' 데이터가 있는 행을 확인하여 반복
+    For row = 2 To ws.Cells(ws.Rows.Count, "A").End(xlUp).Row ' A열을 기준으로 마지막 행 찾기
+        departureNo = ws.Cells(row, "departureNo").Value
+        material = ws.Cells(row, "Material").Value
+        supplier = ws.Cells(row, "Supplier").Value
+
+        ' Material과 Supplier가 동일한 조건을 만족하는 경우
+        If material = supplier Then
+            ' SQL 삽입 쿼리 작성
+            sqlQuery = "INSERT INTO YourTableName (departureNo) " & _
+                       "VALUES ('" & departureNo & "')"
+            
+            ' DB에 쿼리 실행
+            conn.Execute sqlQuery
+        End If
+    Next row
+    
+    ' 연결 종료
+    conn.Close
+    Set conn = Nothing
+
+    ' 엑셀 파일 닫기
+    wb.Close False
+    Set wb = Nothing
+
+    MsgBox "Data has been successfully inserted into SQL database.", vbInformation
+
+End Sub
