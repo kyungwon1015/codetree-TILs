@@ -38,6 +38,9 @@ Sub InsertDepartureNoToSQL()
         material = ws.Cells(row, "Material").Value
         supplier = ws.Cells(row, "Supplier").Value
 
+        ' departureNo가 문자열이므로 작은따옴표로 감싸서 SQL에 삽입
+        departureNo = "'" & departureNo & "'" ' departureNo 값이 'pgz040584546'와 같은 문자열이라면 작은따옴표로 감쌈
+
         ' DB에서 Material과 Supplier가 일치하는지 확인
         checkQuery = "SELECT COUNT(*) FROM YourTableName " & _
                      "WHERE material = '" & material & "' AND supplier = '" & supplier & "'"
@@ -49,7 +52,7 @@ Sub InsertDepartureNoToSQL()
         If rs.Fields(0).Value > 0 Then
             ' SQL 쿼리로 departureNo 삽입
             sqlQuery = "INSERT INTO YourTableName (departureNo) " & _
-                       "VALUES ('" & departureNo & "')"
+                       "VALUES (" & departureNo & ")"  ' departureNo가 문자열이므로 작은따옴표로 감싸서 삽입
             conn.Execute sqlQuery
         End If
     Next row
