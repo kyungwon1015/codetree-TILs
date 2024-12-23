@@ -68,7 +68,7 @@ End Sub
 ' 셀 값이 비어있거나 오류일 때 처리하는 함수
 Function SafeGetCellValue(ws As Worksheet, row As Long, col As String) As String
     Dim cellValue As Variant
-    cellValue = ws.Cells(row, col).Value
+    cellValue = ws.Cells(row, col).Text ' Text 형식으로 셀 값을 가져옴
     
     ' 오류 값 처리
     If IsError(cellValue) Then
@@ -76,6 +76,6 @@ Function SafeGetCellValue(ws As Worksheet, row As Long, col As String) As String
     ElseIf IsEmpty(cellValue) Then
         SafeGetCellValue = "" ' 빈 값 처리
     Else
-        SafeGetCellValue = Trim(CStr(cellValue)) ' 값이 있으면 문자열로 변환하고 공백 제거
+        SafeGetCellValue = Trim(cellValue) ' 값이 있으면 공백 제거
     End If
 End Function
