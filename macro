@@ -33,11 +33,24 @@ Sub InsertDepartureNoToSQL()
     ' 데이터가 있는 행을 확인하여 반복
     For row = 2 To ws.Cells(ws.Rows.Count, "A").End(xlUp).Row ' A열을 기준으로 마지막 행 찾기
         ' DepartureNo 값 가져오기
-        departureNo = CStr(ws.Cells(row, "DepartureNo").Value)
+        If Not IsEmpty(ws.Cells(row, "DepartureNo").Value) Then
+            departureNo = CStr(ws.Cells(row, "DepartureNo").Value)
+        Else
+            departureNo = "" ' 빈 값이 있을 경우 처리
+        End If
 
         ' Material 및 Supplier 값 가져오기
-        material = CStr(ws.Cells(row, "Material").Value)
-        supplier = CStr(ws.Cells(row, "Supplier").Value)
+        If Not IsEmpty(ws.Cells(row, "Material").Value) Then
+            material = CStr(ws.Cells(row, "Material").Value)
+        Else
+            material = "" ' 빈 값이 있을 경우 처리
+        End If
+
+        If Not IsEmpty(ws.Cells(row, "Supplier").Value) Then
+            supplier = CStr(ws.Cells(row, "Supplier").Value)
+        Else
+            supplier = "" ' 빈 값이 있을 경우 처리
+        End If
 
         ' DB에서 Material과 Supplier가 일치하는 경우에만 DepartureNo를 삽입
         insertQuery = "INSERT INTO YourTableName (DepartureNo) " & _
