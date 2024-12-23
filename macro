@@ -33,24 +33,11 @@ Sub InsertDepartureNoToSQL()
     ' 데이터가 있는 행을 확인하여 반복
     For row = 2 To ws.Cells(ws.Rows.Count, "A").End(xlUp).Row ' A열을 기준으로 마지막 행 찾기
         ' DepartureNo 값 가져오기
-        If Not IsEmpty(ws.Cells(row, "DepartureNo").Value) Then
-            departureNo = CStr(ws.Cells(row, "DepartureNo").Value)
-        Else
-            departureNo = "" ' 빈 값이 있을 경우 처리
-        End If
+        departureNo = SafeGetCellValue(ws, row, "DepartureNo")
 
         ' Material 및 Supplier 값 가져오기
-        If Not IsEmpty(ws.Cells(row, "Material").Value) Then
-            material = CStr(ws.Cells(row, "Material").Value)
-        Else
-            material = "" ' 빈 값이 있을 경우 처리
-        End If
-
-        If Not IsEmpty(ws.Cells(row, "Supplier").Value) Then
-            supplier = CStr(ws.Cells(row, "Supplier").Value)
-        Else
-            supplier = "" ' 빈 값이 있을 경우 처리
-        End If
+        material = SafeGetCellValue(ws, row, "Material")
+        supplier = SafeGetCellValue(ws, row, "Supplier")
 
         ' DB에서 Material과 Supplier가 일치하는 경우에만 DepartureNo를 삽입
         insertQuery = "INSERT INTO YourTableName (DepartureNo) " & _
@@ -77,3 +64,15 @@ Sub InsertDepartureNoToSQL()
     MsgBox "Data has been successfully inserted into SQL database.", vbInformation
 
 End Sub
+
+' 셀 값이 비어있거나 Null일 때 처리하는 함수
+Function SafeGetCellValue(ws As Worksheet, row As Long, col As String) As String
+    Dim cellValue As Variant
+    cellValue = ws.Cells(row, col).Value
+    
+    If IsEmpty(cellValue) Or IsNull(cellValue) Then
+        SafeGetCellValue = "" ' 빈 값 처리
+    Else
+        SafeGetCellValue = Trim(CStr(cellValue)) ' 값이 있으면 문자열로 변환하고 공백 제거
+    End If
+End Function
